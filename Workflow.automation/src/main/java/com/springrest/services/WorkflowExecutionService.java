@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import com.springrest.Entities.*;
 import com.springrest.httpUtils.HttpUtils;
-import com.springrest.kafka.WorkflowKafkaProducer;
+//import com.springrest.kafka.WorkflowKafkaProducer;
 import com.springrest.repository.*;
 import com.springrest.helpers.PostScriptResult;
 import com.springrest.helpers.ScriptResult;
@@ -29,16 +29,17 @@ public class WorkflowExecutionService {
 	private final ScriptEngineService scriptEngineService;
 	private WorkflowTriggerRepository workflowTriggerRepository;
 	private final ObjectMapper mapper = new ObjectMapper();
-	private WorkflowKafkaProducer kafkaProducer;
+
 	private boolean useMock = false;
 
-	public WorkflowExecutionService(WorkflowRepository workflowRepo, WorkflowStepRepository stepRepo ,WorkflowKafkaProducer kafkaProducer,
-			ConditionService conditionService, WorkflowStepInputRepository inputRepo,
-			WorkflowStepOutputRepository outputRepo, WorkflowRunRepository runRepo,
-			WorkflowHistoryRepository historyRepo, HttpUtils httpUtils, AuthGenerationService authGenerationService,
-			ScriptEngineService scriptEngineService, WorkflowTriggerRepository workflowTriggerRepository) {
+	public WorkflowExecutionService(WorkflowRepository workflowRepo, WorkflowStepRepository stepRepo,
+			 ConditionService conditionService,
+			WorkflowStepInputRepository inputRepo, WorkflowStepOutputRepository outputRepo,
+			WorkflowRunRepository runRepo, WorkflowHistoryRepository historyRepo, HttpUtils httpUtils,
+			AuthGenerationService authGenerationService, ScriptEngineService scriptEngineService,
+			WorkflowTriggerRepository workflowTriggerRepository) {
 		this.workflowRepo = workflowRepo;
-        this.kafkaProducer=kafkaProducer;
+		
 		this.stepRepo = stepRepo;
 		this.inputRepo = inputRepo;
 		this.conditionService = conditionService;
@@ -63,7 +64,7 @@ public class WorkflowExecutionService {
 
 		Map<String, Map<String, Object>> executionContext = new LinkedHashMap<>();
 		Set<Long> allowedSteps = new HashSet<>();
-	   executionContext.put("step1", payload);
+		executionContext.put("step1", payload);
 
 //		if (webhookPayload == null) {
 //			seedTriggerOutputs(workflowId, executionContext);
@@ -122,7 +123,7 @@ public class WorkflowExecutionService {
 
 					continue;
 				}
-	
+
 				Long stepId = step.getId();
 				System.out.println("▶️ Executing Step ID: " + stepId);
 
@@ -135,18 +136,17 @@ public class WorkflowExecutionService {
 				}
 
 				long startTime = System.currentTimeMillis();
-				if (step.getAction() != null 
-					    && step.getAction().getKey() != null 
-					    && step.getAction().getKey().equalsIgnoreCase("Get Image Status")) {
+				if (step.getAction() != null && step.getAction().getKey() != null
+						&& step.getAction().getKey().equalsIgnoreCase("Get Image Status")) {
 
-					    System.out.println("⏳ Waiting 10 seconds before calling Get Image Status...");
+					System.out.println("⏳ Waiting 10 seconds before calling Get Image Status...");
 
-					    try {
-					        Thread.sleep(20000); 
-					    } catch (InterruptedException e) {
-					        Thread.currentThread().interrupt();
-					    }
+					try {
+						Thread.sleep(20000);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
 					}
+				}
 				Map<String, Object> apiResponse = useMock ? getMockResponse(step, resolvedInputs)
 						: executeRealApi(step, resolvedInputs);
 				System.out.println("apiResponse " + apiResponse.toString());
@@ -307,8 +307,7 @@ public class WorkflowExecutionService {
 			Map<String, Object> rawBody = new HashMap<>();
 
 			ScriptResult scriptResult = scriptEngineService.executePreScript(script, finalUrl, toJsonString(body), // Body
-																													// (API
-																													// body)
+																													// (API																								// body)
 					toJsonString(inputs), finalHeaders, finalQueryParams, connection);
 			String finalBody = scriptResult.getBody() != null ? scriptResult.getBody() : toJsonString(body);
 			System.out.println("finalBody " + finalBody);

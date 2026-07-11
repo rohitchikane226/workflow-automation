@@ -11,7 +11,7 @@ import com.springrest.Entities.*;
 import com.springrest.helpers.PostScriptResult;
 import com.springrest.helpers.ScriptResult;
 import com.springrest.httpUtils.HttpUtils;
-import com.springrest.kafka.WorkflowKafkaProducer;
+//import com.springrest.kafka.WorkflowKafkaProducer;
 import com.springrest.repository.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -40,8 +40,8 @@ public class PollingService {
 	private final ExecutorService executor = new ThreadPoolExecutor(20, 50, 60, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<>(1000), new ThreadPoolExecutor.CallerRunsPolicy());
 	private final ObjectMapper objectMapper = new ObjectMapper();
-	@Autowired
-	private WorkflowKafkaProducer kafkaProducer;
+//	@Autowired
+//	private WorkflowKafkaProducer kafkaProducer;
 
 	public PollingService(WorkflowRepository workflowRepo, WorkflowStepRepository stepRepo,
 			WorkflowStepOutputRepository outputRepo, WorkflowStepInputRepository inputRepo,
@@ -143,16 +143,16 @@ public class PollingService {
 				historyRepo.save(history);
 				saveTriggerOutputs(triggerStep, record);
 				processedRecordRepo.save(new ProcessedRecord(workflowId, uniqueValue, LocalDateTime.now()));
-//				executor.submit(() -> {
-//					try {
-//						workflowExecutionService.executeWorkflow(workflowId, seedTriggerOutputs(workflowId));
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				});
-				Map<String, Object> payload = seedTriggerOutputs(workflowId);
-
-				kafkaProducer.sendWorkflowEvent(workflowId, payload);
+				executor.submit(() -> {
+					try {
+						workflowExecutionService.executeWorkflow(workflowId, seedTriggerOutputs(workflowId));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+//				Map<String, Object> payload = seedTriggerOutputs(workflowId);
+//
+//				kafkaProducer.sendWorkflowEvent(workflowId, payload);
 				
 			}
 		} catch (Exception e) {
