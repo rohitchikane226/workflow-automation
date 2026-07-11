@@ -8,7 +8,7 @@ import com.springrest.services.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/workflow-steps/{stepId}/outputs")
 public class WorkflowStepOutputController {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.springrest.Entities.*;
 import com.springrest.repository.*;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/connectors")
 public class ConnectorController {
