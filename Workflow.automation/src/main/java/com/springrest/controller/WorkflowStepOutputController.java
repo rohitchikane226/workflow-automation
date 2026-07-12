@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.springrest.Entities.*;
+import com.springrest.dto.WorkflowStepOutputDto;
 import com.springrest.services.*;
 
 import java.util.List;
@@ -19,8 +20,15 @@ public class WorkflowStepOutputController {
     }
 
     @GetMapping
-    public List<WorkflowStepOutput> getOutputs(@PathVariable Long stepId) {
-        return outputService.getOutputsByStep(stepId);
+    public List<WorkflowStepOutputDto> getOutputs(@PathVariable Long stepId) {
+
+        return outputService.getOutputsByStep(stepId)
+                .stream()
+                .map(output -> new WorkflowStepOutputDto(
+                        output.getId(),
+                        output.getKey(),
+                        output.getValue()))
+                .toList();
     }
 
     @PostMapping

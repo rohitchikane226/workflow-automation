@@ -6,6 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.springrest.Entities.*;
+import com.springrest.dto.ActionDTO;
+import com.springrest.dto.AuthFieldDto;
+import com.springrest.dto.ConnectorDTO;
+import com.springrest.dto.ConnectorDetailsDto;
+import com.springrest.dto.TriggerDTO;
 import com.springrest.repository.*;
 
 @CrossOrigin(origins = "*")
@@ -26,27 +31,85 @@ public class ConnectorController {
     }
 
     @GetMapping
-    public List<Connector> getAllConnectors() {
-    	return connectorRepo.findAll();
+    public List<ConnectorDTO> getAllConnectors() {
+
+        return connectorRepo.findAll()
+                .stream()
+                .map(connector -> new ConnectorDTO(
+                        connector.getId(),
+                        connector.getName(),
+                        connector.getAppKey(),
+                        connector.getLogoUrl(),
+                        connector.getDescription()
+                ))
+                .toList();
     }
   @PostMapping
   public Connector createConnector(@RequestBody Connector connector){
 	  return connectorRepo.save(connector);
   }
     // Get one connector
-    @GetMapping("/{id}")
-    public ResponseEntity<Connector> getConnector(@PathVariable Long id) {
-        return connectorRepo.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<ConnectorDetailsDto> getConnector(@PathVariable Long id) {
+
+      return connectorRepo.findById(id)
+              .map(connector -> {
+
+                  List<AuthFieldDto> authFields = connector.getAuthFields()
+                          .stream()
+                          .map(field -> new AuthFieldDto(
+                                  field.getId(),
+                                  field.getKeyName(),
+                                  field.getLabel(),
+                                  field.getType(),
+                                  field.isRequired(),
+                                  field.getPlaceholder(),
+                                  field.getExampleValue()
+                          ))
+                          .toList();
+
+                  ConnectorDetailsDto dto = new ConnectorDetailsDto(
+                          connector.getId(),
+                          connector.getName(),
+                          connector.getAppKey(),
+                          connector.getLogoUrl(),
+                          connector.getDescription(),
+                          connector.getAuthType(),
+                          authFields
+                  );
+
+                  return ResponseEntity.ok(dto);
+              })
+              .orElse(ResponseEntity.notFound().build());
+  }
+    
     @GetMapping("/{id}/actions")
-    public List<Action> getConnectorActions(@PathVariable Long id) {
-        return actionRepo.findByConnectorId(id);
+    public List<ActionDTO> getConnectorActions(@PathVariable Long id) {
+
+        return actionRepo.findByConnectorId(id)
+                .stream()
+                .map(action -> new ActionDTO(
+                        action.getId(),
+                        action.getLabel(),
+                        action.isHasDynamicFields(),
+                        action.getIsHidden(),
+                        action.getKey()
+                ))
+                .toList();
     }
     @GetMapping("/{id}/triggers")
-    public List<Trigger> getConnectorTriggers(@PathVariable Long id) {
-        return triggerRepo.findByConnectorId(id);
+    public List<TriggerDTO> getConnectorTriggers(@PathVariable Long id) {
+
+        return triggerRepo.findByConnectorId(id)
+                .stream()
+                .map(trigger -> new TriggerDTO(
+                        trigger.getId(),
+                        trigger.getLabel(),
+                        trigger.getHasDynamicFields(),
+                        trigger.getTriggerType(),
+                        trigger.getKey()
+                ))
+                .toList();
     }
     @PostMapping("/{connectorId}/authfields")
     public ResponseEntity<AuthField> addAuthField(

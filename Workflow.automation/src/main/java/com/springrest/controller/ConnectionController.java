@@ -1,6 +1,7 @@
 package com.springrest.controller;
 
 import com.springrest.Entities.*;
+import com.springrest.dto.ConnectionDto;
 import com.springrest.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -98,7 +99,20 @@ public class ConnectionController {
 
 	@GetMapping("/connector/{connectorId}")
 	public ResponseEntity<?> getConnectionsByConnector(@PathVariable Long connectorId) {
-		return ResponseEntity.ok(connectionRepository.findByConnectorId(connectorId));
+
+	    List<ConnectionDto> connections = connectionRepository
+	            .findByConnectorId(connectorId)
+	            .stream()
+	            .map(c -> new ConnectionDto(
+	                    c.getId(),
+	                    c.getUserId(),
+	                    c.getName(),
+	                    c.getCreatedAt(),
+	                    c.getUpdatedAt()
+	            ))
+	            .toList();
+
+	    return ResponseEntity.ok(connections);
 	}
 
 	@GetMapping("/{connectionId}")

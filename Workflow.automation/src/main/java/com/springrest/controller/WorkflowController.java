@@ -349,28 +349,54 @@ public class WorkflowController {
 	// ======================= STEP CONNECTION =======================
 
 	@PostMapping("/{workflowId}/steps/{stepId}/connection")
-	public ResponseEntity<WorkflowStep> addConnectionToStep(@PathVariable Long workflowId, @PathVariable Long stepId,
-			@RequestBody Map<String, Object> payload) {
-		Long connectionId = Long.valueOf(String.valueOf(payload.get("id")));
-		// stepId = Long.valueOf(String.valueOf(payload.get("stepId")));
-		WorkflowStep step = stepRepo.findById(stepId).filter(s -> s.getWorkflow().getId().equals(workflowId))
-				.orElseThrow();
-		if (connectionId != null) {
-			Connection connection = connectionRepo.findById(connectionId).orElseThrow();
-			step.setConnection(connection);
-			stepRepo.save(step);
-			if (step.getTrigger() != null && step.getTrigger().getTriggerType().equals("webhook")) {
-				System.out.println("called");
-				try {
-					webhookService.subscribe(step.getWorkflow(), step.getTrigger(), connection,Collections.emptyMap() );
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-			}
-			return ResponseEntity.ok(step);
-		} else {
-			return ResponseEntity.badRequest().build();
-		}
+	public ResponseEntity<Map<String, Object>> addConnectionToStep(
+	        @PathVariable Long workflowId,
+	        @PathVariable Long stepId,
+	        @RequestBody Map<String, Object> payload) {
+
+	    Long connectionId = Long.valueOf(String.valueOf(payload.get("id")));
+
+	    WorkflowStep step = stepRepo.findById(stepId)
+	            .filter(s -> s.getWorkflow().getId().equals(workflowId))
+	            .orElseThrow();
+
+	    if (connectionId != null) {
+
+	        Connection connection = connectionRepo.findById(connectionId).orElseThrow();
+
+	        step.setConnection(connection);
+	        stepRepo.save(step);
+
+	        if (step.getTrigger() != null &&
+	                "webhook".equals(step.getTrigger().getTriggerType())) {
+
+	            try {
+	                webhookService.subscribe(
+	                        step.getWorkflow(),
+	                        step.getTrigger(),
+	                        connection,
+	                        Collections.emptyMap()
+	                );
+	            } catch (JsonProcessingException e) {
+	                e.printStackTrace();
+	            }
+	        }
+
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("success", true);
+	        response.put("message", "Connection added successfully.");
+	        response.put("connectionId", connection.getId());
+	        response.put("stepId", step.getId());
+
+	        return ResponseEntity.ok(response);
+	    }
+
+	    return ResponseEntity.badRequest().body(
+	            Map.of(
+	                    "success", false,
+	                    "message", "Invalid connection id."
+	            )
+	    );
 	}
 
 	@PutMapping("/{workflowId}/steps/{stepId}/connection")
