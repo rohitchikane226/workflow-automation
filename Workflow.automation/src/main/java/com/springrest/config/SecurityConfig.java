@@ -46,7 +46,8 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
             "http://localhost:4200",
-            "https://workflow-automation-frontend-cfiizyhij-workflowify.vercel.app"
+            "https://workflow-automation-frontend-cfiizyhij-workflowify.vercel.app",
+            "https://workflow-automation-frontend-coral.vercel.app"
         ));
 
         config.setAllowedMethods(List.of(
