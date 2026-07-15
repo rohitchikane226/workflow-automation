@@ -55,10 +55,17 @@ public class OAuthController {
 	            .orElseThrow(() -> new RuntimeException("Connection not found"));
 
 	    Connector connector = connection.getConnector();
-
-	    String callbackUrl =
+      boolean prod=true;
+      String callbackUrl;
+      if(!prod) {
+	    callbackUrl =
 	            "http://localhost:8080/api/oauth/callback/" +
 	            connector.getAppKey().toLowerCase();
+      }else {
+    	  callbackUrl =
+  	            "https://workflow-automation-production-4a67.up.railway.app/api/oauth/callback/" +
+  	            connector.getAppKey().toLowerCase();
+      }
 
 	    // 🔐 BACKEND-GENERATED STATE (CRITICAL)
 	    Map<String, Object> statePayload = new HashMap<>();

@@ -48,7 +48,7 @@ public class WebhookService {
         String uuid = UUID.randomUUID().toString(); 
 //        String webhookUrl =  
 //        		"http://localhost:8080/webhooks/" + uuid;
-        String webhookUrl="https://unseditiously-contrarious-melody.ngrok-free.dev/webhooks/"+uuid;
+        String webhookUrl="https://workflow-automation-production-4a67.up.railway.app/webhooks/"+uuid;
 
         Map<String, Object> input = new HashMap<>();
 
@@ -111,10 +111,6 @@ public class WebhookService {
         workflowTrigger.setStatus("DISABLED");
         workflowTriggerRepository.save(workflowTrigger);
     }
-
-    /* =========================================================
-       Helper
-       ========================================================= */
     private String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
