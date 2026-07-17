@@ -92,9 +92,6 @@ public class OAuthController {
 	    return ResponseEntity.ok(Map.of("redirectUrl", finalUrl));
 	}
 
-	// ============================================================================
-	// STEP 2: CALLBACK - EXCHANGE CODE FOR TOKENS
-	// ============================================================================
 	@GetMapping("/callback/{connectorName}")
 	public void oauthCallback(
 	        @PathVariable String connectorName,

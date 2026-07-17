@@ -48,7 +48,7 @@ public class WebhookService {
         String uuid = UUID.randomUUID().toString(); 
 //        String webhookUrl =  
 //        		"http://localhost:8080/webhooks/" + uuid;
-        String webhookUrl="https://workflow-automation-production-4a67.up.railway.app/webhooks/"+uuid;
+        String webhookUrl="https://workflow-engine.rohitchikane226.workers.dev/webhooks/"+uuid;
 
         Map<String, Object> input = new HashMap<>();
 
