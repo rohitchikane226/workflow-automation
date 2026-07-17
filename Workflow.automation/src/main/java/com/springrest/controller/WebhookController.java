@@ -2,8 +2,10 @@ package com.springrest.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,5 +37,15 @@ public class WebhookController {
 			workflowExecutionService.executeWorkflow(workflowId, payload);
 		}
 		return ResponseEntity.ok("Webhook processed");
+	}
+	@GetMapping("/api/internal/webhooks/{uuid}")
+	public ResponseEntity<Map<String, Object>> getWebhook(@PathVariable String uuid) {
+
+	    WorkflowTrigger workflowTrigger = workflowExecutionService.getTriggerByWebhookUuid(uuid);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("workflowId", workflowTrigger.getWorkflow().getId());
+	    response.put("status", workflowTrigger.getWorkflow().isActive());
+	    return ResponseEntity.ok(response);
 	}
 }
