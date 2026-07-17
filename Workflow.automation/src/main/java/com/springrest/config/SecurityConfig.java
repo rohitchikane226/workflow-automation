@@ -32,6 +32,7 @@ public class SecurityConfig {
              .requestMatchers("/auth/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/connectors/**").permitAll()
             .requestMatchers("/api/oauth/**").permitAll() 
+            .requestMatchers("/webhooks/**").permitAll()
               .anyRequest().authenticated()
             )
             .addFilterBefore((jakarta.servlet.Filter) jwtFilter,
